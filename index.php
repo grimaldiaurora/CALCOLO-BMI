@@ -1,24 +1,22 @@
 <?php
-// Inizializzazione delle variabili
+// Inizializzazione variabili
 $errore = "";
 $nome = "";
 $bmi = 0;
 $categoria = "";
 
-// Colore di sfondo di default per la pagina
+// Colore di sfondo di default per il caricamento iniziale (GET)
 $colore_sfondo = "#F1F3F5";
 
-// CONTROLLO DEL METODO DI RICHIESTA CON $_SERVER:
-// Se la richiesta è POST -> Elabora i dati e mostra i risultati
-// Se la richiesta è GET -> Mostra il form di inserimento
+// Se la richiesta è in POST, elaboriamo i dati inviati dal form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Recupero dati inviati dal form tramite superglobale $_POST
+    // Recupero dati inviati con la superglobale $_POST
     $nome_input = isset($_POST['nome']) ? trim($_POST['nome']) : '';
     $peso_input = isset($_POST['peso']) ? trim($_POST['peso']) : '';
     $altezza_input = isset($_POST['altezza']) ? trim($_POST['altezza']) : '';
 
-    // 1. Controllo presenza di campi vuoti o stringhe al posto dei numeri
+    // 1. Controllo se i campi sono vuoti o contengono testo non numerico
     if (empty($nome_input) || empty($peso_input) || empty($altezza_input)) {
         $errore = "Tutti i campi sono obbligatori.";
     } elseif (!is_numeric($peso_input) || !is_numeric($altezza_input)) {
@@ -31,17 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($peso <= 0 || $altezza_cm <= 0) {
             $errore = "Peso e altezza devono essere valori maggiori di zero.";
         } else {
-            // Conversione dell'altezza da centimetri a metri
+            // Conversione dell'altezza da cm a metri
             $altezza_m = $altezza_cm / 100;
 
-            // Calcolo del denominatore [altezza (m) * altezza (m)] tramite la funzione pow()
+            // Calcolo dell'altezza al quadrato tramite la funzione di libreria pow()
             $altezza_quadrato = pow($altezza_m, 2);
 
             if ($altezza_quadrato > 0) {
-                // Formula del BMI: peso / (altezza * altezza)
+                // Formula BMI: peso / (altezza * altezza)
                 $bmi = $peso / $altezza_quadrato;
 
-                // Controlli sulla griglia BMI per categoria e colore di sfondo
+                // Griglia BMI per categoria e colore di sfondo
                 if ($bmi < 18.5) {
                     $categoria = "Sottopeso";
                     $colore_sfondo = "#FFF9C4"; // Giallo chiaro
@@ -78,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       padding: 0;
     }
 
-    /* Il colore dello sfondo viene impostato dinamicamente via PHP */
+    /* Colore di sfondo dinamico impostato dal PHP */
     body {
       font-family: sans-serif;
       background-color: <?php echo $colore_sfondo; ?>;
@@ -92,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       transition: background-color 0.4s ease;
     }
 
-    /* Contenitore principale (minimo 250px) */
+    /* Contenitore principale (minimo 250px di larghezza) */
     .container {
       width: 100%;
       min-width: 250px;
@@ -109,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       text-align: center;
     }
 
-    /* Card con sfondo bianco, padding 24px e angoli 12px con ombra */
+    /* Card bianca con padding 24px, angoli 12px e ombra */
     .card {
       background-color: #FFFFFF;
       width: 100%;
@@ -118,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    /* Struttura form: label, input e messaggi */
+    /* Struttura form e spaziature */
     .form-group {
       display: flex;
       flex-direction: column;
@@ -137,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       margin-bottom: 6px;
     }
 
-    /* Campo con placeholder a tutta larghezza */
+    /* Input a tutta larghezza */
     input[type="text"] {
       width: 100%;
       padding: 10px 12px;
@@ -153,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border-color: #1F2328;
     }
 
-    /* Messaggio di errore in rosso */
+    /* Messaggio di errore */
     .error-box {
       color: #D9383A;
       font-size: 0.85rem;
@@ -179,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       background-color: #32383E;
     }
 
-    /* Vista risultato */
+    /* Schermata risultati */
     .result-box {
       text-align: center;
       line-height: 1.6;
@@ -211,27 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="card">
       
-      <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errore)): ?>
-        
-        <!-- VISUALIZZAZIONE DATI (Se la richiesta è in POST e non ci sono errori) -->
-        <div class="result-box">
-          <p>Ciao <strong><?php echo $nome; ?></strong>, il tuo BMI è:</p>
-          <div class="bmi-value"><?php echo number_format($bmi, 2); ?></div>
-          <p>Categoria: <strong><?php echo $categoria; ?></strong></p>
+      <?php if ($_SERVER['REQUEST_METHOD'] === 'GET'): ?>
 
-          <!-- Torna alla schermata di inserimento GET -->
-          <a href="index.php" class="btn-back">Nuovo Calcolo</a>
-        </div>
-
-      <?php else: ?>
-
-        <!-- SCHERMATA INSERIMENTO DATI (Iniziale via GET oppure se ci sono errori nel POST) -->
-        <?php if (!empty($errore)): ?>
-          <div class="error-box">
-            <?php echo $errore; ?>
-          </div>
-        <?php endif; ?>
-
+        <!-- VISUALIZZAZIONE FORM (QUANDO LA RICHIESTA È IN GET) -->
         <form action="index.php" method="POST">
           
           <div class="form-group">
@@ -252,6 +232,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <button type="submit" class="btn-submit">Calcola</button>
 
         </form>
+
+      <?php else: ?>
+
+        <!-- VISUALIZZAZIONE RISULTATI O ERRORI (QUANDO LA RICHIESTA È IN POST) -->
+        <?php if (!empty($errore)): ?>
+          
+          <!-- Se ci sono errori nei dati inviati -->
+          <div class="result-box">
+            <div class="error-box"><?php echo $errore; ?></div>
+            <a href="index.php" class="btn-back">Riprova</a>
+          </div>
+
+        <?php else: ?>
+
+          <!-- Se i dati sono corretti mostra il calcolo del BMI -->
+          <div class="result-box">
+            <p>Ciao <strong><?php echo $nome; ?></strong>, il tuo BMI è:</p>
+            <div class="bmi-value"><?php echo number_format($bmi, 2); ?></div>
+            <p>Categoria: <strong><?php echo $categoria; ?></strong></p>
+
+            <a href="index.php" class="btn-back">Nuovo Calcolo</a>
+          </div>
+
+        <?php endif; ?>
 
       <?php endif; ?>
 
