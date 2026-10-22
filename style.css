@@ -4,9 +4,10 @@
   padding: 0;
 }
 
+/* Sfondo della pagina fisso e neutro */
 body {
   font-family: sans-serif;
-  background-color: var(--bg-color, #F1F3F5);
+  background-color: #F1F3F5;
   color: #1F2328;
   min-height: 100vh;
   display: flex;
@@ -14,7 +15,6 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  transition: background-color 0.4s ease;
 }
 
 .container {
@@ -32,12 +32,15 @@ h1 {
   text-align: center;
 }
 
+/* Card con colore di sfondo e bordo dinamici gestiti dalle variabili CSS */
 .card {
-  background-color: #FFFFFF;
+  background-color: var(--card-bg, #FFFFFF);
+  border: 2px solid var(--card-border, #D0D7DE);
   width: 100%;
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.4s ease;
 }
 
 .form-group {
@@ -57,7 +60,8 @@ label {
   margin-bottom: 6px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #D0D7DE;
@@ -66,9 +70,11 @@ input[type="text"] {
   font-family: sans-serif;
   color: #1F2328;
   outline: none;
+  background-color: #FFFFFF;
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus,
+input[type="number"]:focus {
   border-color: #1F2328;
 }
 

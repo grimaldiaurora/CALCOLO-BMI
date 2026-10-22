@@ -1,44 +1,30 @@
 <?php
 $errore = "";
-$nome = "";
-$bmi = 0;
-$categoria = "";
 $colore_sfondo = "#F1F3F5";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome_input = trim($_POST['nome'] ?? '');
-    $peso_input = trim($_POST['peso'] ?? '');
-    $altezza_input = trim($_POST['altezza'] ?? '');
+    $nome = trim($_POST['nome'] ?? '');
+    $peso = floatval($_POST['peso'] ?? 0);
+    $altezza_cm = floatval($_POST['altezza'] ?? 0);
 
-    if (empty($nome_input) || empty($peso_input) || empty($altezza_input)) {
-        $errore = "Tutti i campi sono obbligatori.";
-    } elseif (!is_numeric($peso_input) || !is_numeric($altezza_input)) {
-        $errore = "Inserisci solo valori numerici nei campi peso e altezza.";
+    if (empty($nome) || $peso <= 0 || $altezza_cm <= 0) {
+        $errore = "Inserisci valori validi per tutti i campi.";
     } else {
-        $peso = floatval($peso_input);
-        $altezza_cm = floatval($altezza_input);
+        $altezza_m = $altezza_cm / 100;
+        $bmi = $peso / pow($altezza_m, 2);
 
-        if ($peso <= 0 || $altezza_cm <= 0) {
-            $errore = "Peso e altezza devono essere maggiori di zero.";
+        if ($bmi < 18.5) {
+            $categoria = "Sottopeso";
+            $colore_sfondo = "#FFF9C4";
+        } elseif ($bmi <= 24.9) {
+            $categoria = "Normopeso (peso forma)";
+            $colore_sfondo = "#C8E6C9";
+        } elseif ($bmi <= 29.9) {
+            $categoria = "Sovrappeso";
+            $colore_sfondo = "#FFE0B2";
         } else {
-            $altezza_m = $altezza_cm / 100;
-            $bmi = $peso / pow($altezza_m, 2);
-
-            if ($bmi < 18.5) {
-                $categoria = "Sottopeso";
-                $colore_sfondo = "#FFF9C4";
-            } elseif ($bmi <= 24.9) {
-                $categoria = "Normopeso (peso forma)";
-                $colore_sfondo = "#C8E6C9";
-            } elseif ($bmi <= 29.9) {
-                $categoria = "Sovrappeso";
-                $colore_sfondo = "#FFE0B2";
-            } else {
-                $categoria = "Obesità";
-                $colore_sfondo = "#FFCDD2";
-            }
-
-            $nome = htmlspecialchars($nome_input);
+            $categoria = "Obesità";
+            $colore_sfondo = "#FFCDD2";
         }
     }
 }
@@ -47,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calcolatore BMI</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -57,23 +42,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Calcolatore BMI</h1>
 
     <div class="card">
-      
       <?php if ($_SERVER['REQUEST_METHOD'] === 'GET'): ?>
 
         <form action="index.php" method="POST">
           <div class="form-group">
             <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" placeholder="Inserisci il tuo nome">
+            <input type="text" id="nome" name="nome" placeholder="Inserisci il tuo nome" required>
           </div>
 
           <div class="form-group">
             <label for="peso">Peso (kg)</label>
-            <input type="text" id="peso" name="peso" placeholder="Es. 70.5">
+            <input type="number" id="peso" name="peso" step="0.1" placeholder="Es. 70.5" required>
           </div>
 
           <div class="form-group last-group">
             <label for="altezza">Altezza (cm)</label>
-            <input type="text" id="altezza" name="altezza" placeholder="Es. 175">
+            <input type="number" id="altezza" name="altezza" step="0.1" placeholder="Es. 175" required>
           </div>
 
           <button type="submit" class="btn-submit">Calcola</button>
@@ -81,22 +65,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <?php else: ?>
 
-        <?php if (!empty($errore)): ?>
-          <div class="result-box">
+        <div class="result-box">
+          <?php if (!empty($errore)): ?>
             <div class="error-box"><?php echo $errore; ?></div>
             <a href="index.php" class="btn-back">Riprova</a>
-          </div>
-        <?php else: ?>
-          <div class="result-box">
-            <p>Ciao <strong><?php echo $nome; ?></strong>, il tuo BMI è:</p>
+          <?php else: ?>
+            <p>Ciao <strong><?php echo htmlspecialchars($nome); ?></strong>, il tuo BMI è:</p>
             <div class="bmi-value"><?php echo number_format($bmi, 2); ?></div>
             <p>Categoria: <strong><?php echo $categoria; ?></strong></p>
             <a href="index.php" class="btn-back">Nuovo Calcolo</a>
-          </div>
-        <?php endif; ?>
+          <?php endif; ?>
+        </div>
 
       <?php endif; ?>
-
     </div>
   </div>
 
